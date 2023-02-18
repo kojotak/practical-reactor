@@ -143,7 +143,7 @@ public class c7_ErrorHandling extends ErrorHandlingBase {
     public void billion_dollar_mistake() {
         Flux<String> content = getFilesContent()
                 .flatMap(Function.identity())
-                //todo: change this line only
+                .onErrorContinue( (error,object) -> System.err.println("Sh*t happens: " + error) )//todo: change this line only
                 ;
 
         StepVerifier.create(content)
@@ -167,7 +167,13 @@ public class c7_ErrorHandling extends ErrorHandlingBase {
     public void resilience() {
         //todo: change code as you need
         Flux<String> content = getFilesContent()
-                .flatMap(Function.identity()); //start from here
+                .flatMap(Function.identity())
+                //start from here
+                //https://devdojo.com/ketonemaniac/reactor-onerrorcontinue-vs-onerrorresume
+                .onErrorResume( e -> Mono.empty())
+                .onErrorStop()// <-- this is important
+                //TODO not working
+        ;
 
         //don't change below this line
         StepVerifier.create(content)
